@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Login | MHT-CET / JEE College Predictor 2025–26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C1B33;--ink2:#3D5166;--ink3:#6B7E94;
+  --saffron:#E8640A;--saffron-lt:#FEF0E6;
+  --green:#137A4B;--red:#B91C1C;
+  --surface:#F7F8FA;--card:#FFFFFF;
+  --border:#DDE3EC;--border2:#EEF1F6;
+  --r:12px;--r-sm:8px;
+  --sans:'Plus Jakarta Sans',sans-serif;
+}
+body{font-family:var(--sans);background:var(--surface);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+.header{background:var(--ink);padding:0;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(255,255,255,.02) 20px,rgba(255,255,255,.02) 21px);}
+.header-inner{position:relative;z-index:2;padding:24px 20px 28px;max-width:480px;margin:0 auto;text-align:center;}
+.gov-strip{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.1);}
+.ashoka{width:32px;height:32px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.gov-text{display:flex;flex-direction:column;text-align:left;}
+.gov-text span:first-child{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.12em;}
+.gov-text span:last-child{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.7);}
+.inspiring{font-size:12px;font-weight:600;color:#F7A96A;letter-spacing:.05em;margin-bottom:14px;opacity:.9;}
+.header-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(232,100,10,.15);border:1px solid rgba(232,100,10,.3);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:#F7A96A;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:#F7A96A;animation:blink 2s infinite}
+.header h1{font-size:clamp(1.2rem,5vw,1.6rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px;letter-spacing:-.02em;}
+.header h1 em{font-style:normal;color:#F7A96A}
+.header-sub{font-size:12px;color:rgba(255,255,255,.5);line-height:1.55;}
+
+/* CARD */
+.login-wrap{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:0 16px 40px;}
+.login-card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);box-shadow:0 4px 24px rgba(12,27,51,.09);width:100%;max-width:440px;margin-top:-20px;padding:24px 22px 22px;position:relative;z-index:3;}
+.login-title{font-size:17px;font-weight:800;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em;}
+.login-sub{font-size:12px;color:var(--ink3);margin-bottom:22px;line-height:1.5;}
+
+/* TABS */
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:3px;gap:3px;margin-bottom:20px;}
+.auth-tab{padding:9px 8px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--ink3);font-family:var(--sans);transition:all .15s;}
+.auth-tab.active{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+/* FIELDS */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.field label{font-size:10.5px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.07em;}
+.field input{height:44px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:0 14px;font-size:14px;font-family:var(--sans);color:var(--ink);background:var(--card);transition:border-color .15s,box-shadow .15s;width:100%;}
+.field input:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,100,10,.1);}
+.field input::placeholder{color:#B8C4D0}
+.field input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(185,28,28,.1);}
+.field-error{color:var(--red);font-size:11px;font-weight:600;margin-top:2px;}
+
+.input-icon-wrap{position:relative;}
+.input-icon-wrap input{padding-left:40px;}
+.input-icon-wrap .iicon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink3);pointer-events:none;}
+
+/* OTP ROW */
+.otp-row{display:flex;gap:8px;align-items:flex-start;}
+.otp-row .field{flex:1;margin-bottom:0;}
+.send-otp-btn{height:44px;padding:0 14px;background:var(--saffron);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer;white-space:nowrap;transition:background .15s;flex-shrink:0;margin-top:21px;}
+.send-otp-btn:disabled{background:#ccc;cursor:not-allowed;}
+.send-otp-btn:hover:not(:disabled){background:#D05509;}
+
+/* OTP BOXES */
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin:4px 0;}
+.otp-box{width:44px;height:52px;border:1.5px solid var(--border);border-radius:var(--r-sm);text-align:center;font-size:22px;font-weight:700;font-family:var(--sans);color:var(--ink);background:var(--card);transition:border-color .15s,box-shadow .15s;}
+.otp-box:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,100,10,.1);}
+.otp-box.error{border-color:var(--red);}
+
+/* TIMER */
+.otp-timer{text-align:center;font-size:11.5px;color:var(--ink3);margin-top:6px;}
+.otp-timer span{color:var(--saffron);font-weight:700;}
+.resend-link{color:var(--saffron);font-weight:700;cursor:pointer;text-decoration:underline;}
+
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:20px;}
+.step{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;}
+.step.done .step-num{background:var(--green);color:#fff;}
+.step.active .step-num{background:var(--saffron);color:#fff;}
+.step.pending .step-num{background:var(--border);color:var(--ink3);}
+.step.done .step-label{color:var(--green);}
+.step.active .step-label{color:var(--ink);font-weight:700;}
+.step.pending .step-label{color:var(--ink3);}
+.step-line{flex:1;height:1px;background:var(--border);}
+
+/* SUCCESS BOX */
+.success-box{text-align:center;padding:20px 10px;}
+.success-icon{font-size:48px;margin-bottom:12px;}
+.success-title{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;}
+.success-sub{font-size:13px;color:var(--ink3);line-height:1.5;}
+
+/* BUTTONS */
+.submit-btn{width:100%;height:46px;background:var(--saffron);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;transition:background .15s,box-shadow .15s;box-shadow:0 2px 10px rgba(232,100,10,.3);}
+.submit-btn:hover{background:#D05509;}
+.submit-btn:disabled{background:#ccc;cursor:not-allowed;box-shadow:none;}
+
+.or-divider{display:flex;align-items:center;gap:10px;margin:16px 0;font-size:11px;font-weight:600;color:var(--ink3);}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border2);}
+
+.switch-line{margin-top:16px;text-align:center;font-size:12.5px;color:var(--ink3);}
+.switch-line a{color:var(--saffron);font-weight:700;text-decoration:none;cursor:pointer;}
+
+.form-panel{display:none;}
+.form-panel.active{display:block;}
+
+.terms{margin-top:12px;text-align:center;font-size:11px;color:var(--ink3);line-height:1.6;}
+.terms a{color:var(--saffron);text-decoration:none;font-weight:600;}
+
+/* FOOTER */
+.page-footer{text-align:center;padding:16px;font-size:11.5px;color:var(--ink3);border-top:1px solid var(--border2);}
+.page-footer strong{color:var(--ink);}
+
+/* TOAST */
+.toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#137A4B;color:#fff;padding:12px 20px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:999;white-space:nowrap;}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+@media(max-width:480px){
+  .header-inner{padding:20px 16px 28px;}
+  .login-wrap{padding:0 12px 40px;}
+  .login-card{padding:20px 16px 18px;margin-top:-16px;}
+  .submit-btn{height:50px;font-size:15px;}
+  .field input{height:48px;font-size:15px;}
+  .auth-tab{padding:10px 8px;}
+  .otp-box{width:40px;height:48px;font-size:20px;}
+  .send-otp-btn{height:48px;font-size:11px;padding:0 10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="gov-strip">
+      <div class="ashoka">🏛️</div>
+      <div class="gov-text">
+        <span>Government of Maharashtra</span>
+        <span>State Common Entrance Test Cell</span>
+      </div>
+    </div>
+    <p class="inspiring">🎯 Your rank is just the beginning — your future is yours to choose.</p>
+    <div class="header-badge"><span class="badge-dot"></span>AY 2025–26 · Official CAP Round I Data</div>
+    <h1>MHT-CET / JEE<br><em>College Predictor</em></h1>
+    <p class="header-sub">Sign in to access personalised college predictions for Maharashtra Engineering Admissions.</p>
+  </div>
+</div>
+
+<!-- CARD -->
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login', this)">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('register', this)">Register</button>
+    </div>
+
+    <!-- ══ LOGIN PANEL ══ -->
+    <div id="panel-login" class="form-panel active">
+
+      <!-- Step 1: Enter Email -->
+      <div id="login-step1">
+        <div class="login-title">Welcome Back 👋</div>
+        <p class="login-sub">Enter your email to receive a verification OTP.</p>
+
+        <div class="field">
+          <label>Email Address</label>
+          <div class="input-icon-wrap">
+            <svg class="iicon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <span class="field-error" id="login-email-err" style="display:none"></span>
+        </div>
+
+        <button class="submit-btn" id="login-send-btn" onclick="sendLoginOTP()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send OTP to Email
+        </button>
+        <div class="switch-line">Don't have an account? <a onclick="switchTabByName('register')">Register free</a></div>
+      </div>
+
+      <!-- Step 2: Enter OTP -->
+      <div id="login-step2" style="display:none;">
+        <div class="step-indicator">
+          <div class="step done"><div class="step-num">✓</div><span class="step-label">Email</span></div>
+          <div class="step-line"></div>
+          <div class="step active"><div class="step-num">2</div><span class="step-label">Verify OTP</span></div>
+        </div>
+
+        <div class="login-title">Check your inbox 📩</div>
+        <p class="login-sub" id="login-otp-sub">OTP sent to your email. Enter the 6-digit code below.</p>
+
+        <div class="otp-boxes">
+          <input class="otp-box" id="ob0" maxlength="1" inputmode="numeric" oninput="otpInput(this,0,'login')" onkeydown="otpKeydown(event,0,'login')">
+          <input class="otp-box" id="ob1" maxlength="1" inputmode="numeric" oninput="otpInput(this,1,'login')" onkeydown="otpKeydown(event,1,'login')">
+          <input class="otp-box" id="ob2" maxlength="1" inputmode="numeric" oninput="otpInput(this,2,'login')" onkeydown="otpKeydown(event,2,'login')">
+          <input class="otp-box" id="ob3" maxlength="1" inputmode="numeric" oninput="otpInput(this,3,'login')" onkeydown="otpKeydown(event,3,'login')">
+          <input class="otp-box" id="ob4" maxlength="1" inputmode="numeric" oninput="otpInput(this,4,'login')" onkeydown="otpKeydown(event,4,'login')">
+          <input class="otp-box" id="ob5" maxlength="1" inputmode="numeric" oninput="otpInput(this,5,'login')" onkeydown="otpKeydown(event,5,'login')">
+        </div>
+        <span class="field-error" id="login-otp-err" style="display:none;text-align:center;display:block;margin-top:6px;"></span>
+
+        <div class="otp-timer" id="login-timer">Resend OTP in <span id="login-countdown">60</span>s</div>
+        <div class="otp-timer" id="login-resend-row" style="display:none;">
+          <a class="resend-link" onclick="resendOTP('login')">Resend OTP</a>
+        </div>
+
+        <button class="submit-btn" style="margin-top:16px;" onclick="verifyLoginOTP()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Verify & Sign In
+        </button>
+        <div style="text-align:center;margin-top:12px;">
+          <a style="font-size:12px;color:var(--ink3);cursor:pointer;" onclick="backToEmail('login')">← Change email</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ REGISTER PANEL ══ -->
+    <div id="panel-register" class="form-panel">
+
+      <!-- Step 1: Fill details -->
+      <div id="reg-step1">
+        <div class="login-title">Create Account 🚀</div>
+        <p class="login-sub">Register to get personalised college predictions.</p>
+
+        <div class="field">
+          <label>Full Name</label>
+          <div class="input-icon-wrap">
+            <svg class="iicon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="reg-name" placeholder="Your full name" autocomplete="name">
+          </div>
+          <span class="field-error" id="reg-name-err" style="display:none"></span>
+        </div>
+
+        <div class="field">
+          <label>Mobile Number</label>
+          <div class="input-icon-wrap">
+            <svg class="iicon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.09 9.8a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 14.92z"/></svg>
+            <input type="tel" id="reg-mobile" placeholder="10-digit mobile number" autocomplete="tel">
+          </div>
+          <span class="field-error" id="reg-mobile-err" style="display:none"></span>
+        </div>
+
+        <div class="field">
+          <label>Email Address</label>
+          <div class="input-icon-wrap">
+            <svg class="iicon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <span class="field-error" id="reg-email-err" style="display:none"></span>
+        </div>
+
+        <button class="submit-btn" onclick="sendRegisterOTP()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send Verification OTP
+        </button>
+        <div class="terms">By registering, you agree to our <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>.</div>
+        <div class="switch-line" style="margin-top:12px;">Already have an account? <a onclick="switchTabByName('login')">Sign in</a></div>
+      </div>
+
+      <!-- Step 2: OTP verify -->
+      <div id="reg-step2" style="display:none;">
+        <div class="step-indicator">
+          <div class="step done"><div class="step-num">✓</div><span class="step-label">Details</span></div>
+          <div class="step-line"></div>
+          <div class="step active"><div class="step-num">2</div><span class="step-label">Verify OTP</span></div>
+        </div>
+
+        <div class="login-title">Verify your email 📩</div>
+        <p class="login-sub" id="reg-otp-sub">OTP sent. Enter the 6-digit code below.</p>
+
+        <div class="otp-boxes">
+          <input class="otp-box" id="rb0" maxlength="1" inputmode="numeric" oninput="otpInput(this,0,'reg')" onkeydown="otpKeydown(event,0,'reg')">
+          <input class="otp-box" id="rb1" maxlength="1" inputmode="numeric" oninput="otpInput(this,1,'reg')" onkeydown="otpKeydown(event,1,'reg')">
+          <input class="otp-box" id="rb2" maxlength="1" inputmode="numeric" oninput="otpInput(this,2,'reg')" onkeydown="otpKeydown(event,2,'reg')">
+          <input class="otp-box" id="rb3" maxlength="1" inputmode="numeric" oninput="otpInput(this,3,'reg')" onkeydown="otpKeydown(event,3,'reg')">
+          <input class="otp-box" id="rb4" maxlength="1" inputmode="numeric" oninput="otpInput(this,4,'reg')" onkeydown="otpKeydown(event,4,'reg')">
+          <input class="otp-box" id="rb5" maxlength="1" inputmode="numeric" oninput="otpInput(this,5,'reg')" onkeydown="otpKeydown(event,5,'reg')">
+        </div>
+        <span class="field-error" id="reg-otp-err" style="display:none;text-align:center;display:block;margin-top:6px;"></span>
+
+        <div class="otp-timer" id="reg-timer">Resend OTP in <span id="reg-countdown">60</span>s</div>
+        <div class="otp-timer" id="reg-resend-row" style="display:none;">
+          <a class="resend-link" onclick="resendOTP('reg')">Resend OTP</a>
+        </div>
+
+        <button class="submit-btn" style="margin-top:16px;" onclick="verifyRegisterOTP()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Verify & Create Account
+        </button>
+        <div style="text-align:center;margin-top:12px;">
+          <a style="font-size:12px;color:var(--ink3);cursor:pointer;" onclick="backToEmail('reg')">← Change details</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="page-footer">
+  Built with ❤️ by <strong>Chandrakant Patave</strong> &nbsp;·&nbsp;
+  <a href="tel:+918421321871" style="color:#E8640A;text-decoration:none;font-weight:600;">+91 84213 21871</a> &nbsp;·&nbsp;
+  <a href="mailto:chandrkantpatave70@gmail.com" style="color:#E8640A;text-decoration:none;font-weight:600;">chandrkantpatave70@gmail.com</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── EmailJS Init ──
+emailjs.init('UD7Bv4bIOZ5uM0gxa');
+
+const SERVICE_ID  = 'service_pljq38a';
+const TEMPLATE_ID = 'template_2ioe7cn';
+
+// ── State ──
+let generatedOTP = '';
+let otpExpiry = 0;
+let timerIntervals = {};
+let currentLoginEmail = '';
+let currentRegEmail = '';
+let currentRegName = '';
+
+// ── Tab Switch ──
+function switchTab(name, el) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+function switchTabByName(name) {
+  document.querySelectorAll('.auth-tab')[name === 'login' ? 0 : 1].click();
+}
+
+// ── Toast ──
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color || '#137A4B';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+
+// ── Field Error ──
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function clearErr(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ''; el.style.display = 'none'; }
+}
+function setInputError(inputId, hasError) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  if (hasError) inp.classList.add('error');
+  else inp.classList.remove('error');
+}
+
+// ── Generate OTP ──
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// ── Send OTP via EmailJS ──
+async function sendOTP(email, name) {
+  generatedOTP = generateOTP();
+  otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+  const params = {
+    to_email: email,
+    to_name: name || 'Student',
+    otp: generatedOTP
+  };
+
+  await emailjs.send(SERVICE_ID, TEMPLATE_ID, params);
+  return generatedOTP;
+}
+
+// ── Countdown Timer ──
+function startTimer(prefix) {
+  if (timerIntervals[prefix]) clearInterval(timerIntervals[prefix]);
+  let seconds = 60;
+  document.getElementById(prefix + '-countdown').textContent = seconds;
+  document.getElementById(prefix + '-timer').style.display = 'block';
+  document.getElementById(prefix + '-resend-row').style.display = 'none';
+
+  timerIntervals[prefix] = setInterval(() => {
+    seconds--;
+    const el = document.getElementById(prefix + '-countdown');
+    if (el) el.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(timerIntervals[prefix]);
+      const timerEl = document.getElementById(prefix + '-timer');
+      const resendEl = document.getElementById(prefix + '-resend-row');
+      if (timerEl) timerEl.style.display = 'none';
+      if (resendEl) resendEl.style.display = 'block';
+    }
+  }, 1000);
+}
+
+// ── OTP Box Input ──
+function otpInput(el, index, prefix) {
+  el.value = el.value.replace(/\D/g, '').slice(-1);
+  const pfx = prefix === 'login' ? 'ob' : 'rb';
+  if (el.value && index < 5) {
+    document.getElementById(pfx + (index + 1)).focus();
+  }
+}
+function otpKeydown(e, index, prefix) {
+  const pfx = prefix === 'login' ? 'ob' : 'rb';
+  if (e.key === 'Backspace' && !e.target.value && index > 0) {
+    document.getElementById(pfx + (index - 1)).focus();
+  }
+}
+function getOTPValue(prefix) {
+  const pfx = prefix === 'login' ? 'ob' : 'rb';
+  return [0,1,2,3,4,5].map(i => document.getElementById(pfx+i).value).join('');
+}
+function clearOTPBoxes(prefix) {
+  const pfx = prefix === 'login' ? 'ob' : 'rb';
+  [0,1,2,3,4,5].forEach(i => {
+    const el = document.getElementById(pfx+i);
+    el.value = '';
+    el.classList.remove('error');
+  });
+}
+
+// ── Resend OTP ──
+async function resendOTP(prefix) {
+  const email = prefix === 'login' ? currentLoginEmail : currentRegEmail;
+  const name  = prefix === 'login' ? 'Student' : currentRegName;
+  clearOTPBoxes(prefix);
+  clearErr(prefix + '-otp-err');
+  showToast('📨 Sending new OTP…', '#1976D2');
+  try {
+    await sendOTP(email, name);
+    startTimer(prefix);
+    showToast('✅ New OTP sent!');
+    document.getElementById((prefix === 'login' ? 'ob' : 'rb') + '0').focus();
+  } catch(e) {
+    showToast('❌ Failed to send OTP. Try again.', '#B91C1C');
+  }
+}
+
+// ── BACK ──
+function backToEmail(prefix) {
+  if (prefix === 'login') {
+    document.getElementById('login-step2').style.display = 'none';
+    document.getElementById('login-step1').style.display = 'block';
+    clearOTPBoxes('login');
+    if (timerIntervals['login']) clearInterval(timerIntervals['login']);
+  } else {
+    document.getElementById('reg-step2').style.display = 'none';
+    document.getElementById('reg-step1').style.display = 'block';
+    clearOTPBoxes('reg');
+    if (timerIntervals['reg']) clearInterval(timerIntervals['reg']);
+  }
+}
+
+// ════════════════════════
+// LOGIN FLOW
+// ════════════════════════
+async function sendLoginOTP() {
+  const email = document.getElementById('login-email').value.trim();
+  clearErr('login-email-err');
+  setInputError('login-email', false);
+
+  if (!email) {
+    showErr('login-email-err', 'Please enter your email address.');
+    setInputError('login-email', true);
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showErr('login-email-err', 'Please enter a valid email address.');
+    setInputError('login-email', true);
+    return;
+  }
+
+  currentLoginEmail = email;
+  const btn = document.getElementById('login-send-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Sending…';
+
+  try {
+    await sendOTP(email, 'Student');
+    document.getElementById('login-otp-sub').textContent = `OTP sent to ${email}. Enter the 6-digit code below.`;
+    document.getElementById('login-step1').style.display = 'none';
+    document.getElementById('login-step2').style.display = 'block';
+    startTimer('login');
+    setTimeout(() => document.getElementById('ob0').focus(), 100);
+    showToast('📨 OTP sent to your email!');
+  } catch(e) {
+    showToast('❌ Failed to send OTP. Check your email and try again.', '#B91C1C');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send OTP to Email';
+}
+
+function verifyLoginOTP() {
+  const entered = getOTPValue('login');
+  clearErr('login-otp-err');
+  document.querySelectorAll('#panel-login .otp-box').forEach(b => b.classList.remove('error'));
+
+  if (entered.length < 6) {
+    showErr('login-otp-err', 'Please enter all 6 digits.');
+    document.querySelectorAll('#panel-login .otp-box').forEach(b => b.classList.add('error'));
+    return;
+  }
+  if (Date.now() > otpExpiry) {
+    showErr('login-otp-err', 'OTP has expired. Please resend.');
+    return;
+  }
+  if (entered !== generatedOTP) {
+    showErr('login-otp-err', 'Incorrect OTP. Please try again.');
+    document.querySelectorAll('#panel-login .otp-box').forEach(b => b.classList.add('error'));
+    return;
+  }
+
+  // ✅ SUCCESS
+  if (timerIntervals['login']) clearInterval(timerIntervals['login']);
+  showToast('✅ Verified! Redirecting…');
+  setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+}
+
+// ════════════════════════
+// REGISTER FLOW
+// ════════════════════════
+async function sendRegisterOTP() {
+  const name   = document.getElementById('reg-name').value.trim();
+  const mobile = document.getElementById('reg-mobile').value.trim();
+  const email  = document.getElementById('reg-email').value.trim();
+
+  // Clear all errors
+  ['reg-name-err','reg-mobile-err','reg-email-err'].forEach(clearErr);
+  ['reg-name','reg-mobile','reg-email'].forEach(id => setInputError(id, false));
+
+  let hasError = false;
+  if (!name) { showErr('reg-name-err','Please enter your full name.'); setInputError('reg-name',true); hasError=true; }
+  if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) { showErr('reg-mobile-err','Enter valid 10-digit Indian mobile number.'); setInputError('reg-mobile',true); hasError=true; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('reg-email-err','Enter a valid email address.'); setInputError('reg-email',true); hasError=true; }
+  if (hasError) return;
+
+  currentRegEmail = email;
+  currentRegName  = name;
+
+  showToast('📨 Sending OTP…', '#1976D2');
+
+  try {
+    await sendOTP(email, name);
+    document.getElementById('reg-otp-sub').textContent = `OTP sent to ${email}. Enter the 6-digit code below.`;
+    document.getElementById('reg-step1').style.display = 'none';
+    document.getElementById('reg-step2').style.display = 'block';
+    startTimer('reg');
+    setTimeout(() => document.getElementById('rb0').focus(), 100);
+    showToast('📨 OTP sent to your email!');
+  } catch(e) {
+    showToast('❌ Failed to send OTP. Check email and try again.', '#B91C1C');
+  }
+}
+
+function verifyRegisterOTP() {
+  const entered = getOTPValue('reg');
+  clearErr('reg-otp-err');
+  document.querySelectorAll('#panel-register .otp-box').forEach(b => b.classList.remove('error'));
+
+  if (entered.length < 6) {
+    showErr('reg-otp-err', 'Please enter all 6 digits.');
+    document.querySelectorAll('#panel-register .otp-box').forEach(b => b.classList.add('error'));
+    return;
+  }
+  if (Date.now() > otpExpiry) {
+    showErr('reg-otp-err', 'OTP has expired. Please resend.');
+    return;
+  }
+  if (entered !== generatedOTP) {
+    showErr('reg-otp-err', 'Incorrect OTP. Please try again.');
+    document.querySelectorAll('#panel-register .otp-box').forEach(b => b.classList.add('error'));
+    return;
+  }
+
+  // ✅ SUCCESS
+  if (timerIntervals['reg']) clearInterval(timerIntervals['reg']);
+  showToast('🎉 Account verified! Redirecting…');
+  setTimeout(() => {window.location.href = 'index.html'; }, 1500);
+}
+</script>
+</body>
+</html>
