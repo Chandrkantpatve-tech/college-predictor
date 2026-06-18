@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CollegeKart 🎓 — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0D1B2A;
+  --ink2:#3A4F63;
+  --ink3:#7A8FA6;
+  --ink4:#B0BEC9;
+  --accent:#E05C00;
+  --accent-lt:#FFF3EC;
+  --accent-dk:#C05000;
+  --green:#0E7A4A;
+  --green-lt:#EDFBF4;
+  --red:#C0220C;
+  --red-lt:#FFF1EE;
+  --surface:#F2F5F9;
+  --card:#FFFFFF;
+  --border:#E0E7EF;
+  --border2:#EEF2F7;
+  --panel-bg:#0D1B2A;
+  --sans:'Inter',sans-serif;
+  --mono:'DM Mono',monospace;
+  --sh: 0 2px 8px rgba(13,27,42,.06), 0 12px 40px rgba(13,27,42,.08);
+}
+
+html,body{height:100%;}
+body{overflow-x:hidden;}
+body{font-family:var(--sans);background:var(--surface);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+
+/* ══════════════ LAYOUT ══════════════ */
+.page{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+
+/* ── LEFT PANEL ── */
+.left-panel{background:var(--panel-bg);display:flex;flex-direction:column;justify-content:space-between;padding:48px 52px;position:relative;overflow:hidden;}
+.left-panel::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 20%,rgba(224,92,0,.18) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 90% 80%,rgba(13,51,100,.5) 0%,transparent 60%);
+}
+.left-panel::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.lp-inner{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;}
+
+/* Logo */
+.ck-logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none;margin-bottom:auto;}
+.ck-logo-icon{
+  width:46px;height:46px;
+  background:var(--accent);
+  border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 6px 20px rgba(224,92,0,.4);
+}
+.ck-logo-icon svg{width:24px;height:24px;}
+.ck-logo-name{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.04em;line-height:1;}
+.ck-logo-tag{font-size:10px;font-weight:500;color:rgba(255,255,255,.38);letter-spacing:.1em;text-transform:uppercase;margin-top:3px;}
+
+/* Hero text */
+.lp-hero{padding:40px 0;}
+.lp-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(224,92,0,.15);border:1px solid rgba(224,92,0,.28);border-radius:100px;padding:5px 14px;font-size:10.5px;font-weight:600;color:#F09A6A;text-transform:uppercase;letter-spacing:.09em;margin-bottom:24px;}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:#F09A6A;animation:blink 2s infinite;}
+.lp-hero h1{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;color:#fff;line-height:1.18;letter-spacing:-.035em;margin-bottom:16px;}
+.lp-hero h1 em{font-style:normal;color:#F09A6A;}
+.lp-hero p{font-size:14px;color:rgba(255,255,255,.45);line-height:1.7;max-width:340px;}
+
+/* Stats */
+.lp-stats{display:flex;gap:28px;padding-top:36px;border-top:1px solid rgba(255,255,255,.07);}
+.stat-item{display:flex;flex-direction:column;gap:4px;}
+.stat-num{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.03em;font-family:var(--mono);}
+.stat-label{font-size:11px;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:.02em;}
+
+/* Trust */
+.lp-trust{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:32px;}
+.trust-item{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500;color:rgba(255,255,255,.38);}
+.trust-icon{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.trust-icon svg{width:13px;height:13px;color:rgba(255,255,255,.4);}
+
+/* ── RIGHT PANEL ── */
+.right-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;background:var(--surface);}
+.auth-box{width:100%;max-width:400px;}
+
+/* ── TABS ── */
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#E8EDF4;border-radius:11px;padding:4px;gap:3px;margin-bottom:28px;}
+.auth-tab{padding:9px 8px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--ink3);font-family:var(--sans);transition:all .18s;letter-spacing:-.01em;}
+.auth-tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 6px rgba(13,27,42,.1);}
+
+/* ── FORM HEADER ── */
+.form-title{font-size:21px;font-weight:700;color:var(--ink);letter-spacing:-.03em;margin-bottom:5px;}
+.form-sub{font-size:13px;color:var(--ink3);line-height:1.55;margin-bottom:24px;font-weight:400;}
+
+/* ── STEP INDICATOR ── */
+.step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:22px;}
+.step{display:flex;align-items:center;gap:6px;}
+.step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;font-family:var(--mono);}
+.step-lbl{font-size:11px;font-weight:600;white-space:nowrap;}
+.step.done .step-num{background:var(--green);color:#fff;}
+.step.active .step-num{background:var(--accent);color:#fff;}
+.step.pending .step-num{background:var(--border);color:var(--ink4);}
+.step.done .step-lbl{color:var(--green);}
+.step.active .step-lbl{color:var(--ink);}
+.step.pending .step-lbl{color:var(--ink4);}
+.step-line{flex:1;height:1px;background:var(--border);}
+
+/* ── FIELDS ── */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.field-label{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.07em;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink4);pointer-events:none;display:flex;}
+.field-icon svg{width:15px;height:15px;}
+.field-wrap input,.field-wrap select{
+  -webkit-text-size-adjust:100%;
+  width:100%;height:46px;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:0 14px 0 40px;
+  font-size:13.5px;font-family:var(--sans);
+  color:var(--ink);background:var(--card);
+  transition:border-color .15s,box-shadow .15s;
+  -webkit-appearance:none;
+}
+.field-wrap input:focus,.field-wrap select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3.5px rgba(224,92,0,.09);}
+.field-wrap input::placeholder{color:var(--ink4);font-size:13px;}
+.field-wrap input.err{border-color:var(--red);box-shadow:0 0 0 3.5px rgba(192,34,12,.08);}
+.field-error{font-size:11px;font-weight:600;color:var(--red);display:none;}
+
+/* Phone */
+.phone-row{display:flex;gap:0;}
+.phone-prefix{
+  height:46px;min-width:70px;
+  background:#F6F8FB;border:1.5px solid var(--border);border-right:none;
+  border-radius:10px 0 0 10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:var(--ink2);
+  font-family:var(--mono);gap:5px;flex-shrink:0;padding:0 12px;
+}
+.phone-row .field-wrap{flex:1;}
+.phone-row .field-wrap input{border-radius:0 10px 10px 0;padding-left:14px;}
+
+/* ── OTP BOXES ── */
+.otp-boxes{display:flex;gap:7px;justify-content:center;margin:6px 0 4px;width:100%;}
+.otp-box{
+  width:48px;height:56px;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  text-align:center;
+  font-size:22px;font-weight:700;font-family:var(--mono);
+  color:var(--ink);background:var(--card);
+  transition:border-color .15s,box-shadow .15s,background .15s;
+  -webkit-appearance:none;
+}
+.otp-box:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3.5px rgba(224,92,0,.09);}
+.otp-box.filled{border-color:var(--accent);background:var(--accent-lt);color:var(--accent-dk);}
+.otp-box.err{border-color:var(--red);background:var(--red-lt);}
+
+/* ── TIMER ── */
+.otp-hint{text-align:center;font-size:12px;color:var(--ink3);margin-top:10px;line-height:1.5;}
+.otp-hint span{color:var(--accent);font-weight:600;font-family:var(--mono);}
+.resend-link{color:var(--accent);font-weight:600;cursor:pointer;}
+.resend-link:hover{text-decoration:underline;}
+
+/* ── FIELD ERROR ── */
+.ferr{font-size:11px;font-weight:600;color:var(--red);margin-top:3px;display:none;}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  width:100%;height:48px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:10px;
+  font-size:14px;font-weight:600;font-family:var(--sans);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:-.01em;
+  transition:background .15s,box-shadow .15s,transform .1s;
+  box-shadow:0 3px 14px rgba(224,92,0,.28);
+  margin-top:6px;
+}
+.btn-primary:hover{background:var(--accent-dk);box-shadow:0 4px 20px rgba(224,92,0,.38);}
+.btn-primary:active{transform:scale(.985);}
+.btn-primary:disabled{background:#C8D5E2;cursor:not-allowed;box-shadow:none;}
+
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;border:none;
+  font-size:12px;font-weight:600;color:var(--ink3);
+  font-family:var(--sans);cursor:pointer;padding:0;
+  margin-bottom:18px;transition:color .15s;
+}
+.btn-ghost:hover{color:var(--ink);}
+.btn-ghost svg{width:14px;height:14px;}
+
+/* ── SWITCH ── */
+.switch-line{margin-top:18px;text-align:center;font-size:12.5px;color:var(--ink3);}
+.switch-line a{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none;}
+.switch-line a:hover{text-decoration:underline;}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2);}
+.divider span{font-size:10.5px;font-weight:600;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;}
+
+/* ── TERMS ── */
+.terms{font-size:11px;color:var(--ink4);line-height:1.7;text-align:center;margin-top:14px;}
+.terms a{color:var(--ink3);font-weight:600;text-decoration:none;}
+.terms a:hover{color:var(--accent);}
+
+/* ── TOAST ── */
+.toast{
+  display:none;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+  color:#fff;padding:13px 22px;border-radius:100px;
+  font-size:13px;font-weight:600;font-family:var(--sans);
+  box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:999;white-space:nowrap;
+  transition:opacity .2s;
+}
+
+/* ── PANEL / STEP VISIBILITY ── */
+.form-panel{display:none;}
+.form-panel.active{display:block;}
+.form-step{animation:fadeUp .2s ease;}
+
+/* ── FOOTER ── */
+.auth-footer{text-align:center;padding:20px 16px;font-size:11px;color:var(--ink4);border-top:1px solid var(--border2);}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MOBILE HEADER (hidden on desktop) ── */
+.mobile-header{display:none;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  .page{display:block;min-height:unset;}
+  .left-panel{display:none;}
+
+  /* show the dark mobile header instead */
+  .mobile-header{
+    display:block;
+    background:var(--panel-bg);
+    position:relative;overflow:hidden;
+    padding:28px 24px 36px;
+  }
+  .mobile-header::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 0% 0%,rgba(224,92,0,.2) 0%,transparent 65%),
+      radial-gradient(ellipse 60% 50% at 100% 100%,rgba(13,51,100,.5) 0%,transparent 60%);
+  }
+  .mobile-header::after{
+    content:'';position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+    background-size:32px 32px;
+  }
+  .mh-inner{position:relative;z-index:2;}
+
+  .mh-logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:20px;}
+  .mh-logo-icon{
+    width:40px;height:40px;background:var(--accent);border-radius:11px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    box-shadow:0 4px 14px rgba(224,92,0,.4);
+  }
+  .mh-logo-icon svg{width:21px;height:21px;}
+  .mh-logo-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.04em;line-height:1;}
+  .mh-logo-tag{font-size:9.5px;font-weight:500;color:rgba(255,255,255,.38);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+
+  .mh-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(224,92,0,.15);border:1px solid rgba(224,92,0,.28);
+    border-radius:100px;padding:4px 12px;
+    font-size:10px;font-weight:600;color:#F09A6A;
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;
+  }
+  .mh-title{font-size:1.45rem;font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.03em;margin-bottom:6px;}
+  .mh-title em{font-style:normal;color:#F09A6A;}
+  .mh-sub{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.6;margin-bottom:20px;}
+
+  .mh-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.08);padding-top:16px;}
+  .mh-stat{flex:1;display:flex;flex-direction:column;gap:2px;padding-right:12px;}
+  .mh-stat:not(:last-child){border-right:1px solid rgba(255,255,255,.07);margin-right:12px;}
+  .mh-stat-num{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.03em;font-family:var(--mono);}
+  .mh-stat-lbl{font-size:10px;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:.02em;}
+
+  /* card lifts out of header */
+  .right-panel{
+    padding:0;
+    justify-content:flex-start;
+    align-items:stretch;
+    background:var(--surface);
+    display:block;
+  }
+  .auth-box{
+    max-width:100%;
+    background:var(--card);
+    border-radius:20px 20px 0 0;
+    margin-top:-18px;
+    padding:24px 20px 32px;
+    position:relative;z-index:2;
+    box-shadow:0 -4px 24px rgba(13,27,42,.08);
+    padding-bottom:env(safe-area-inset-bottom, 32px);
+  }
+
+  /* pill drag indicator */
+  .auth-box::before{
+    content:'';display:block;width:40px;height:4px;
+    background:var(--border);border-radius:100px;
+    margin:0 auto 20px;
+  }
+
+  /* bigger tap targets on mobile */
+  .auth-tab{padding:11px 8px;font-size:13.5px;}
+  .btn-primary{height:52px;font-size:15px;border-radius:12px;}
+  .field-wrap input{height:50px;font-size:15px;border-radius:10px;}
+  .phone-prefix{height:50px;}
+  .phone-row .field-wrap input{height:50px;}
+  .otp-box{width:calc((100% - 35px)/6);height:50px;font-size:18px;}
+  .auth-footer{border-radius:0;background:var(--surface);}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ MOBILE HEADER ══════════ -->
+<div class="mobile-header">
+  <div class="mh-inner">
+    <a href="#" class="mh-logo">
+      <div class="mh-logo-icon">
+        <span style="font-size:22px;line-height:1;">🎓</span>
+      </div>
+      <div><div class="mh-logo-name">College<span style="color:#F09A6A;font-style:italic;">Kart</span></div><div class="mh-logo-tag">Engineering Predictor</div></div>
+    </a>
+    <div class="mh-badge"><span class="badge-dot"></span>AY 2025–26 · CAP Round I Live</div>
+    <div class="mh-title">Find your dream <em>college</em>.</div>
+    <div class="mh-sub">MHT-CET &amp; JEE predictions powered by official DTE data.</div>
+    <div class="mh-stats">
+      <div class="mh-stat"><div class="mh-stat-num">50K+</div><div class="mh-stat-lbl">Students</div></div>
+      <div class="mh-stat"><div class="mh-stat-num">1,200+</div><div class="mh-stat-lbl">Colleges</div></div>
+      <div class="mh-stat"><div class="mh-stat-num">98%</div><div class="mh-stat-lbl">Accuracy</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ══════════ LEFT PANEL ══════════ -->
+  <div class="left-panel">
+    <div class="lp-inner">
+
+      <a href="#" class="ck-logo">
+        <div class="ck-logo-icon">
+          <span style="font-size:22px;line-height:1;">🎓</span>
+        </div>
+        <div>
+          <div class="ck-logo-name">College<span style="color:var(--accent);font-style:italic;">Kart</span></div>
+          <div class="ck-logo-tag">Engineering Predictor</div>
+        </div>
+      </a>
+
+      <div class="lp-hero">
+        <div class="lp-badge"><span class="badge-dot"></span>AY 2025–26 · CAP Round I Live</div>
+        <h1>Find your<br>dream <em>college</em><br>with confidence.</h1>
+        <p>Personalised predictions for MHT-CET &amp; JEE students across Maharashtra, powered by official DTE data.</p>
+      </div>
+
+      <div class="lp-stats">
+        <div class="stat-item">
+          <div class="stat-num">50K+</div>
+          <div class="stat-label">Students</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">1,200+</div>
+          <div class="stat-label">Colleges</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">98%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+      </div>
+
+      <div class="lp-trust">
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          Secured with 256-bit encryption
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          Official DTE Maharashtra verified data
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          Real-time round updates
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ RIGHT PANEL ══════════ -->
+  <div class="right-panel">
+    <div class="auth-box">
+        <span class="mobile-logo-name">College<span style="color:var(--accent);font-style:italic;">Kart</span></span>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login',this)">Sign In</button>
+        <button class="auth-tab" onclick="switchTab('register',this)">Register</button>
+      </div>
+
+      <!-- ══ LOGIN ══ -->
+      <div id="panel-login" class="form-panel active">
+
+        <div id="login-s1" class="form-step">
+          <div class="form-title">Welcome back</div>
+          <div class="form-sub">Enter your email to receive a one-time sign-in code.</div>
+
+          <div class="field">
+            <div class="field-label">Email address</div>
+            <div class="field-wrap">
+              <span class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+              <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="ferr" id="l-email-err"></div>
+          </div>
+
+          <button class="btn-primary" id="l-send-btn" onclick="sendLoginOTP()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send sign-in code
+          </button>
+
+          <div class="switch-line" style="margin-top:20px;">No account? <a onclick="switchTabByName('register')">Create one free →</a></div>
+        </div>
+
+        <div id="login-s2" style="display:none;" class="form-step">
+          <div class="step-indicator">
+            <div class="step done"><div class="step-num">✓</div><span class="step-lbl">Email</span></div>
+            <div class="step-line"></div>
+            <div class="step active"><div class="step-num">2</div><span class="step-lbl">Verify</span></div>
+          </div>
+
+          <button class="btn-ghost" onclick="backTo('login')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+
+          <div class="form-title">Check your inbox</div>
+          <div class="form-sub" id="l-otp-sub">We sent a 6-digit code to your email.</div>
+
+          <div class="otp-boxes">
+            <input class="otp-box" id="ob0" maxlength="1" inputmode="numeric" oninput="oI(this,0,'ob')" onkeydown="oK(event,0,'ob')">
+            <input class="otp-box" id="ob1" maxlength="1" inputmode="numeric" oninput="oI(this,1,'ob')" onkeydown="oK(event,1,'ob')">
+            <input class="otp-box" id="ob2" maxlength="1" inputmode="numeric" oninput="oI(this,2,'ob')" onkeydown="oK(event,2,'ob')">
+            <input class="otp-box" id="ob3" maxlength="1" inputmode="numeric" oninput="oI(this,3,'ob')" onkeydown="oK(event,3,'ob')">
+            <input class="otp-box" id="ob4" maxlength="1" inputmode="numeric" oninput="oI(this,4,'ob')" onkeydown="oK(event,4,'ob')">
+            <input class="otp-box" id="ob5" maxlength="1" inputmode="numeric" oninput="oI(this,5,'ob')" onkeydown="oK(event,5,'ob')">
+          </div>
+          <div class="ferr" id="l-otp-err" style="text-align:center;display:none;"></div>
+
+          <div class="otp-hint" id="l-timer-row">Resend code in <span id="l-cd">60</span>s</div>
+          <div class="otp-hint" id="l-resend-row" style="display:none;"><a class="resend-link" onclick="resendOTP('login')">Resend code</a></div>
+
+          <button class="btn-primary" style="margin-top:20px;" onclick="verifyLoginOTP()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Verify &amp; sign in
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ══ REGISTER ══ -->
+      <div id="panel-register" class="form-panel">
+
+        <div id="reg-s1" class="form-step">
+          <div class="form-title">Create account</div>
+          <div class="form-sub">Join 50,000+ students predicting their dream college.</div>
+
+          <div class="field">
+            <div class="field-label">Full name</div>
+            <div class="field-wrap">
+              <span class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+              <input type="text" id="r-name" placeholder="Your full name" autocomplete="name">
+            </div>
+            <div class="ferr" id="r-name-err"></div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Mobile number</div>
+            <div class="phone-row">
+              <div class="phone-prefix">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg>
+                +91
+              </div>
+              <div class="field-wrap" style="flex:1">
+                <input type="tel" id="r-mobile" placeholder="10-digit number" maxlength="10" inputmode="numeric" autocomplete="tel" style="padding-left:14px;">
+              </div>
+            </div>
+            <div class="ferr" id="r-mobile-err"></div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Email address</div>
+            <div class="field-wrap">
+              <span class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+              <input type="email" id="r-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="ferr" id="r-email-err"></div>
+          </div>
+
+          <button class="btn-primary" id="r-send-btn" onclick="sendRegisterOTP()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send verification code
+          </button>
+
+          <div class="terms">By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+          <div class="switch-line">Already have an account? <a onclick="switchTabByName('login')">Sign in →</a></div>
+        </div>
+
+        <div id="reg-s2" style="display:none;" class="form-step">
+          <div class="step-indicator">
+            <div class="step done"><div class="step-num">✓</div><span class="step-lbl">Details</span></div>
+            <div class="step-line"></div>
+            <div class="step active"><div class="step-num">2</div><span class="step-lbl">Verify email</span></div>
+            <div class="step-line"></div>
+            <div class="step pending"><div class="step-num">3</div><span class="step-lbl">Done</span></div>
+          </div>
+
+          <button class="btn-ghost" onclick="backTo('reg')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+
+          <div class="form-title">Verify your email</div>
+          <div class="form-sub" id="r-otp-sub">We sent a 6-digit code. Enter it below.</div>
+
+          <div class="otp-boxes">
+            <input class="otp-box" id="rb0" maxlength="1" inputmode="numeric" oninput="oI(this,0,'rb')" onkeydown="oK(event,0,'rb')">
+            <input class="otp-box" id="rb1" maxlength="1" inputmode="numeric" oninput="oI(this,1,'rb')" onkeydown="oK(event,1,'rb')">
+            <input class="otp-box" id="rb2" maxlength="1" inputmode="numeric" oninput="oI(this,2,'rb')" onkeydown="oK(event,2,'rb')">
+            <input class="otp-box" id="rb3" maxlength="1" inputmode="numeric" oninput="oI(this,3,'rb')" onkeydown="oK(event,3,'rb')">
+            <input class="otp-box" id="rb4" maxlength="1" inputmode="numeric" oninput="oI(this,4,'rb')" onkeydown="oK(event,4,'rb')">
+            <input class="otp-box" id="rb5" maxlength="1" inputmode="numeric" oninput="oI(this,5,'rb')" onkeydown="oK(event,5,'rb')">
+          </div>
+          <div class="ferr" id="r-otp-err" style="text-align:center;display:none;"></div>
+
+          <div class="otp-hint" id="r-timer-row">Resend code in <span id="r-cd">60</span>s</div>
+          <div class="otp-hint" id="r-resend-row" style="display:none;"><a class="resend-link" onclick="resendOTP('reg')">Resend code</a></div>
+
+          <button class="btn-primary" style="margin-top:20px;" onclick="verifyRegisterOTP()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Verify &amp; create account
+          </button>
+        </div>
+
+      </div>
+
+      <div class="auth-footer">© 2025 CollegeKart 🎓. For academic guidance purposes only.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   ⚙️  EMAILJS CONFIG  — fill these in
+══════════════════════════════════════ */
+const EMAILJS_SERVICE_ID  = 'service_pljq38a';
+const EMAILJS_TEMPLATE_ID = 'template_2ioe7cn';
+const EMAILJS_PUBLIC_KEY  = 'UD7Bv4bIOZ5uM0gxa';
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+/* ── state ── */
+let otp='', otpExp=0, loginEmail='', regEmail='', regName='';
+const timers={};
+
+/* ── toast ── */
+function toast(msg,color='#0E7A4A'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=color; t.style.display='block'; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.style.display='none',200);},3000);
+}
+
+/* ── errors ── */
+function showE(id,m){const e=document.getElementById(id);e.textContent=m;e.style.display='block';}
+function clearE(id){const e=document.getElementById(id);e.textContent='';e.style.display='none';}
+function setErr(id,v){const e=document.getElementById(id);if(e)v?e.classList.add('err'):e.classList.remove('err');}
+
+/* ── tabs ── */
+function switchTab(n,btn){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+}
+function switchTabByName(n){
+  const tabs=document.querySelectorAll('.auth-tab');
+  tabs.forEach(t=>t.classList.remove('active'));
+  tabs[n==='login'?0:1].classList.add('active');
+  document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+}
+
+/* ── OTP boxes ── */
+function oI(el,i,p){
+  el.value=el.value.replace(/\D/g,'');
+  el.value?el.classList.add('filled'):el.classList.remove('filled');
+  if(el.value&&i<5)document.getElementById(p+(i+1)).focus();
+}
+function oK(e,i,p){if(e.key==='Backspace'&&!document.getElementById(p+i).value&&i>0)document.getElementById(p+(i-1)).focus();}
+function getOTP(p){return[0,1,2,3,4,5].map(i=>document.getElementById(p+i).value).join('');}
+function clearBoxes(p){[0,1,2,3,4,5].forEach(i=>{const e=document.getElementById(p+i);e.value='';e.classList.remove('filled','err');});}
+
+/* ── timer ── */
+function startTimer(pref){
+  const cd=pref+'-cd', tr=pref+'-timer-row', rr=pref+'-resend-row';
+  let s=60;
+  document.getElementById(cd).textContent=s;
+  document.getElementById(tr).style.display='block';
+  document.getElementById(rr).style.display='none';
+  clearInterval(timers[pref]);
+  timers[pref]=setInterval(()=>{
+    s--;
+    document.getElementById(cd).textContent=s;
+    if(s<=0){clearInterval(timers[pref]);document.getElementById(tr).style.display='none';document.getElementById(rr).style.display='block';}
+  },1000);
+}
+
+/* ── emailjs send ── */
+async function sendOTP(email,name){
+  otp=String(Math.floor(100000+Math.random()*900000));
+  otpExp=Date.now()+10*60*1000;
+  await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{to_email:email,to_name:name,otp_code:otp});
+}
+
+/* ── resend ── */
+async function resendOTP(pref){
+  const email=pref==='login'?loginEmail:regEmail;
+  const name=pref==='login'?'Student':regName;
+  const pb=pref==='login'?'ob':'rb';
+  clearBoxes(pb); clearE(pref==='login'?'l-otp-err':'r-otp-err');
+  toast('Sending new code…','#1565C0');
+  try{await sendOTP(email,name);startTimer(pref==='login'?'l':'r');toast('New code sent!');document.getElementById(pb+'0').focus();}
+  catch(e){toast('Failed to send. Try again.','#C0220C');}
+}
+
+/* ── back ── */
+function backTo(pref){
+  if(pref==='login'){
+    document.getElementById('login-s2').style.display='none';
+    document.getElementById('login-s1').style.display='block';
+    clearBoxes('ob'); clearE('l-otp-err');
+    clearInterval(timers['l']);
+  } else {
+    document.getElementById('reg-s2').style.display='none';
+    document.getElementById('reg-s1').style.display='block';
+    clearBoxes('rb'); clearE('r-otp-err');
+    clearInterval(timers['r']);
+  }
+}
+
+/* ══════════════
+   LOGIN FLOW
+══════════════ */
+async function sendLoginOTP(){
+  const email=document.getElementById('l-email').value.trim();
+  clearE('l-email-err'); setErr('l-email','false');
+  if(!email){showE('l-email-err','Please enter your email address.');setErr('l-email',true);return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showE('l-email-err','Please enter a valid email address.');setErr('l-email',true);return;}
+  loginEmail=email;
+  const btn=document.getElementById('l-send-btn');
+  btn.disabled=true;
+  btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Sending…';
+  try{
+    await sendOTP(email,'Student');
+    document.getElementById('l-otp-sub').textContent=`Code sent to ${email}. Valid for 10 minutes.`;
+    document.getElementById('login-s1').style.display='none';
+    document.getElementById('login-s2').style.display='block';
+    startTimer('l');
+    setTimeout(()=>document.getElementById('ob0').focus(),80);
+    toast('Sign-in code sent!');
+  }catch(e){toast('Failed to send code. Try again.','#C0220C');}
+  btn.disabled=false;
+  btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send sign-in code';
+}
+function verifyLoginOTP(){
+  const entered=getOTP('ob');
+  clearE('l-otp-err');
+  document.querySelectorAll('#panel-login .otp-box').forEach(b=>b.classList.remove('err'));
+  if(entered.length<6){showE('l-otp-err','Please enter all 6 digits.');document.querySelectorAll('#panel-login .otp-box').forEach(b=>b.classList.add('err'));return;}
+  if(Date.now()>otpExp){showE('l-otp-err','Code has expired. Please resend.');return;}
+  if(entered!==otp){showE('l-otp-err','Incorrect code. Please try again.');document.querySelectorAll('#panel-login .otp-box').forEach(b=>b.classList.add('err'));return;}
+  clearInterval(timers['l']);
+  toast('Verified! Redirecting…');
+  setTimeout(()=>{window.location.href='index.html';},1500);
+}
+
+/* ══════════════
+   REGISTER FLOW
+══════════════ */
+async function sendRegisterOTP(){
+  const name=document.getElementById('r-name').value.trim();
+  const mobile=document.getElementById('r-mobile').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  ['r-name-err','r-mobile-err','r-email-err'].forEach(clearE);
+  ['r-name','r-mobile','r-email'].forEach(id=>setErr(id,false));
+  let hasErr=false;
+  if(!name){showE('r-name-err','Please enter your full name.');setErr('r-name',true);hasErr=true;}
+  if(!mobile||!/^[6-9]\d{9}$/.test(mobile)){showE('r-mobile-err','Enter a valid 10-digit Indian mobile number.');setErr('r-mobile',true);hasErr=true;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showE('r-email-err','Enter a valid email address.');setErr('r-email',true);hasErr=true;}
+  if(hasErr)return;
+  regEmail=email; regName=name;
+  const btn=document.getElementById('r-send-btn');
+  btn.disabled=true;
+  btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Sending…';
+  try{
+    await sendOTP(email,name);
+    document.getElementById('r-otp-sub').textContent=`Code sent to ${email}. Valid for 10 minutes.`;
+    document.getElementById('reg-s1').style.display='none';
+    document.getElementById('reg-s2').style.display='block';
+    startTimer('r');
+    setTimeout(()=>document.getElementById('rb0').focus(),80);
+    toast('Verification code sent!');
+  }catch(e){toast('Failed to send code. Try again.','#C0220C');}
+  btn.disabled=false;
+  btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send verification code';
+}
+function verifyRegisterOTP(){
+  const entered=getOTP('rb');
+  clearE('r-otp-err');
+  document.querySelectorAll('#panel-register .otp-box').forEach(b=>b.classList.remove('err'));
+  if(entered.length<6){showE('r-otp-err','Please enter all 6 digits.');document.querySelectorAll('#panel-register .otp-box').forEach(b=>b.classList.add('err'));return;}
+  if(Date.now()>otpExp){showE('r-otp-err','Code has expired. Please resend.');return;}
+  if(entered!==otp){showE('r-otp-err','Incorrect code. Please try again.');document.querySelectorAll('#panel-register .otp-box').forEach(b=>b.classList.add('err'));return;}
+  clearInterval(timers['r']);
+  toast('Account verified! Redirecting…');
+  setTimeout(()=>{window.location.href='index.html';},1500);
+}
+</script>
+</body>
+</html>
