@@ -1200,10 +1200,11 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);min-heig
           <option value="ALL">All Branches</option>
           <option value="CS">Computer Science</option>
           <option value="IT">Information Tech</option>
-          <option value="AIML">AI / ML / DS</option>
+          <option value="AIML">AI / ML / Data Science</option>
           <option value="CS-DS">CS (Data Science)</option>
           <option value="CS-AIML">CS (AI &amp; ML)</option>
           <option value="AIDS">AI &amp; Data Science</option>
+          <option value="CS-CYBER">CS (Cyber Security)</option>
           <option value="EXTC">Electronics (EXTC)</option>
           <option value="MECH">Mechanical</option>
           <option value="CIVIL">Civil</option>
@@ -1546,7 +1547,7 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);min-heig
         <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border-radius:8px;border:1px solid var(--border2)">
           <span style="font-size:16px">📄</span>
           <div>
-            <div style="font-size:12px;font-weight:700;color:var(--ink)">MHT-CET CAP Round I 2026–27</div>
+            <div style="font-size:12px;font-weight:700;color:var(--ink)">MHT-CET CAP Round I 2025–26</div>
             <div style="font-size:10.5px;color:var(--ink3)">Official State CET Cell PDF · cetcell.mahacet.org</div>
           </div>
           <span style="margin-left:auto;font-size:10px;font-weight:700;background:var(--green-lt);color:var(--green);border-radius:4px;padding:2px 7px">Live</span>
@@ -1701,15 +1702,22 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);min-heig
           <option value="ALL">All Branches</option>
           <option value="CS">Computer Science</option>
           <option value="IT">Information Tech</option>
-          <option value="AIML">AI / ML</option>
+          <option value="AIML">AI / ML / Data Science</option>
           <option value="AIDS">AI &amp; Data Science</option>
+          <option value="CS-CYBER">CS (Cyber Security)</option>
+          <option value="CS-DESIGN">CS (Design)</option>
           <option value="EXTC">Electronics (EXTC)</option>
+          <option value="VLSI">VLSI Design</option>
+          <option value="ECE">Electronics &amp; Computer</option>
           <option value="MECH">Mechanical</option>
+          <option value="MECHA">Mechatronics</option>
           <option value="CIVIL">Civil</option>
           <option value="EE">Electrical</option>
+          <option value="ELEC">Electrical &amp; Electronics</option>
           <option value="CHEM">Chemical</option>
           <option value="INSTRU">Instrumentation</option>
-          <option value="ECE">Electronics &amp; Computer</option>
+          <option value="PROD">Production</option>
+          <option value="ROBOT">Robotics &amp; Automation</option>
         </select>
       </div>
       <div class="field">
@@ -2220,6 +2228,29 @@ const BL = {
 
 const locIcon = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
+/**
+ * branchMatch(c, br) — returns true if college c matches the selected branch filter br.
+ *
+ * Problem: several dropdown values don't map 1-to-1 to a single branch code in the data:
+ *   • 'AIML'    → branch=AIML  OR  branch=DS  (both are standalone AI/ML or AI & DS programs)
+ *   • 'CS-AIML' → branch=CS whose course name contains AI / Machine Learning
+ *   • 'CS-DS'   → branch=CS whose course name contains Data Science
+ *   • 'CS-CYBER'→ branch=CS with Cyber Security course  OR  branch=CYBERSE
+ * All other filters remain a direct branch-code equality check.
+ */
+function branchMatch(c, br) {
+  if (br === 'ALL') return true;
+  const co = (c.course || '').toLowerCase();
+  switch (br) {
+    case 'AIML':      return c.branch === 'AIML' || c.branch === 'DS';
+    case 'CS-DS':     return c.branch === 'CS' && co.includes('data science');
+    case 'CS-AIML':   return c.branch === 'CS' && (co.includes('artificial intelligence') || co.includes('machine learning'));
+    case 'CS-CYBER':  return (c.branch === 'CS' && co.includes('cyber')) || c.branch === 'CYBERSE' || c.branch === 'CYBER';
+    case 'CS-DESIGN': return c.branch === 'CS-DESIGN' || (c.branch === 'CS' && co.includes('design'));
+    default:          return c.branch === br;
+  }
+}
+
 function predict() {
   const sc = parseFloat(document.getElementById('score').value);
   const cat = document.getElementById('cat').value;
@@ -2236,15 +2267,11 @@ function predict() {
   const pool = exam === 'mhtcet' ? MHTCET : JEE;
 
   let filtered = pool.filter(c => {
-    if (br !== 'ALL' && c.branch !== br) return false;
+    if (!branchMatch(c, br)) return false;
     if (reg !== 'ALL' && c.region !== reg) return false;
     if (ct !== 'ALL' && c.type !== ct) return false;
     if (exam === 'jee') return c.closing_pct > 0;
-    // For category, must have actual data
-    if (!c.cat[cat] || c.cat[cat] === 0) {
-      // Fallback to OPEN if category missing
-      if (cat !== 'OPEN') return false;
-    }
+    // Must have at least OPEN data; use OPEN as fallback if selected category is missing
     return c.cat['OPEN'] > 0;
   });
 
@@ -6438,7 +6465,7 @@ function predictDSE() {
   }
 
   let filtered = DSE.filter(c => {
-    if (br !== 'ALL' && c.branch !== br) return false;
+    if (!branchMatch(c, br)) return false;
     if (reg !== 'ALL' && c.region !== reg) return false;
     if (ct !== 'ALL' && c.type !== ct) return false;
     if (!c.cat['OPEN']) return false;
