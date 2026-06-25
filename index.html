@@ -580,10 +580,8 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);min-heig
 
 <script>
 /* ══════════════════════════════════════
-   ⚙️  RESEND CONFIG
+   ⚙️  OTP sent via Cloudflare Worker → Resend
 ══════════════════════════════════════ */
-const RESEND_API_KEY   = 're_H2NJbjPk_5Xd6jrvQa2d5srNH8kNxYM9D';
-const RESEND_FROM      = 'CollegeKart <onboarding@resend.dev>';
 
 /* ── state ── */
 let otp='', otpExp=0, loginEmail='', regEmail='', regName='';
@@ -641,48 +639,20 @@ function startTimer(pref){
   },1000);
 }
 
-/* ── resend send ── */
+/* ── resend send via Cloudflare Worker ── */
 async function sendOTP(email, name) {
   otp    = String(Math.floor(100000 + Math.random() * 900000));
   otpExp = Date.now() + 10 * 60 * 1000;
 
-  const html = `
-    <div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #E0E7EF;">
-      <div style="background:#0D1B2A;padding:28px 32px;text-align:center;">
-        <span style="font-size:26px;font-weight:700;color:#fff;letter-spacing:-.03em;">College<span style="color:#E05C00;">Kart</span></span>
-        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;letter-spacing:.1em;text-transform:uppercase;">MHT-CET / JEE College Predictor</div>
-      </div>
-      <div style="padding:32px;">
-        <p style="font-size:15px;font-weight:600;color:#0D1B2A;margin:0 0 8px;">Hi ${name} 👋</p>
-        <p style="font-size:14px;color:#3A4F63;margin:0 0 28px;line-height:1.6;">Use the OTP below to sign in to your CollegeKart account. It is valid for <strong>10 minutes</strong>.</p>
-        <div style="background:#F2F5F9;border-radius:12px;padding:24px;text-align:center;margin-bottom:28px;">
-          <div style="font-size:11px;font-weight:600;color:#7A8FA6;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Your One-Time Password</div>
-          <div style="font-size:40px;font-weight:700;letter-spacing:10px;color:#0D1B2A;font-family:'Courier New',monospace;">${otp}</div>
-        </div>
-        <p style="font-size:12px;color:#7A8FA6;margin:0;line-height:1.6;">If you didn't request this, you can safely ignore this email. Never share this OTP with anyone.</p>
-      </div>
-      <div style="background:#F2F5F9;padding:16px 32px;text-align:center;border-top:1px solid #E0E7EF;">
-        <span style="font-size:11px;color:#B0BEC9;">© 2025 CollegeKart · Free for all Maharashtra students</span>
-      </div>
-    </div>`;
-
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch('https://collegekart-otp.chandrkantpatavedyp.workers.dev', {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from:    RESEND_FROM,
-      to:      [email],
-      subject: `${otp} is your CollegeKart OTP`,
-      html:    html
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, name, otp })
   });
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.message || 'Resend error');
+    throw new Error(err.message || 'Failed to send OTP');
   }
 }
 
